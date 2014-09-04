@@ -17,7 +17,7 @@ def buildIndexMapAndPosList(keyList, indexMap, slabSize, lastOffset, posList):
 		if not indexMap.has_key(key):
 			indexMap[key] = lastOffset
 			lastOffset += slabSize
-			increaseFileSize(slabSize)
+			
 
 		if not posList.has_key(key):
 			posList[keyList[i]] = [i]
@@ -34,26 +34,32 @@ def dumpIndexMap(indexMap):
 def readIndexMap():
 	return cPickle.load(open("OffsetMap", "rb"))
 
-def mergePostingList(postingListForAFile, indexMap, docId, slabSize, dumpedOnce):
+def mergePostingList(postingListForABatch, indexMap, slabSize, dumpedOnce):
 	fileObj = open("PostingList", "r+b")
-	for key in postingListForAFile:	
+	for key in postingListForABatch:	
 		if dumpedOnce.has_key(key): 
 			fileObj.seek(indexMap[key], 0)
 			try:
 				postingListForAWord = cPickle.load(fileObj)
-				postingListForAWord.append([docId, postingListForAFile[key]])
+				postingListForAWord += postingListForABatch[key]
 			except (EOFError,cPickle.UnpicklingError):
 				continue
-				
-			
 		else:
+			increaseFileSize(slabSize)
 			dumpedOnce[key] = ""
-			postingListForAWord = [[docId, postingListForAFile[key]]]
+			postingListForAWord = postingListForABatch[key]
 			
 		fileObj.seek(indexMap[key], 0)
-		tempDump = cPickle.dumps(postingListForAWord)
+		tempDump = cPickle.dumps(postingListForABatch[key])
 		fileObj.write(tempDump);
 	fileObj.close()
+
+def buildPostingListForABatch(postingListForABatch, postingListForAFile, docId):
+	for key in postingListForAFile:
+		if not postingListForABatch.has_key(key):
+			postingListForABatch[key] = [[docId, postingListForAFile[key]]]
+		else:
+			postingListForABatch[key].append([docId, postingListForAFile[key]])
 
 def readPostingFile(indexMap):
 	fileObj = open("PostingList", "rb")
@@ -73,9 +79,10 @@ if __name__ == "__main__":
 	# Tokenising the files to get a keyList
 	keyList = []
 	indexMap = {}
-	slabSize = 10000
+	slabSize = 1000
 	lastOffset = 0
 	dumpedOnce = {}
+	postingListForABatch = {}
 	for i in xrange(0, 1):
 		postingListForAFile = {}
 		for j in xrange(0, 101):
@@ -84,11 +91,10 @@ if __name__ == "__main__":
 			fileObj.close()
 			postingListForAFile = {}
 			lastOffset = buildIndexMapAndPosList(keyList, indexMap, slabSize, lastOffset, postingListForAFile)
-			mergePostingList(postingListForAFile, indexMap, j, slabSize, dumpedOnce)
-			
+			buildPostingListForABatch(postingListForABatch, postingListForAFile, j)
 			print "|keyList| = " + str(len(keyList))
 			print str(j) + "done"
-	
+		mergePostingList(postingListForABatch, indexMap, slabSize, dumpedOnce)
 	# Dumping the index into a file
 	dumpIndexMap(indexMap)
 
