@@ -76,18 +76,18 @@ if __name__ == "__main__":
 	slabSize = 10000
 	lastOffset = 0
 	dumpedOnce = {}
-	postingListForAFile = {}
 	for i in xrange(0, 1):
 		postingListForAFile = {}
 		for j in xrange(0, 101):
 			fileObj = open("./" + str(i) + "/" + str(j), "rb")
 			keyList = tokenize(fileObj)
 			fileObj.close()
+			postingListForAFile = {}
 			lastOffset = buildIndexMapAndPosList(keyList, indexMap, slabSize, lastOffset, postingListForAFile)
-			# print postingListForAFile
+			mergePostingList(postingListForAFile, indexMap, j, slabSize, dumpedOnce)
+			
 			print "|keyList| = " + str(len(keyList))
 			print str(j) + "done"
-		mergePostingList(postingListForAFile, indexMap, j, slabSize, dumpedOnce)
 	
 	# Dumping the index into a file
 	dumpIndexMap(indexMap)
