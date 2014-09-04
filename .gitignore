@@ -1,8 +1,11 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-
+OffsetMap
+PostingList
+test.py
 dataset/
+0/
 test.py
 dummyDataset/
 *.txt
