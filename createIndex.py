@@ -6,9 +6,11 @@ def tokenize(fileObj):
 
 def increaseFileSize(slabSize):
 	fileObj = open("PostingList","ab+")
+	retVal = fileObj.tell()
 	for i in xrange(0,slabSize):
 		fileObj.write('0')
 	fileObj.close()
+	return retVal
 
 def buildIndexMapAndPosList(keyList, indexMap, slabSize, lastOffset, posList):
 	i = 0
@@ -18,7 +20,6 @@ def buildIndexMapAndPosList(keyList, indexMap, slabSize, lastOffset, posList):
 			indexMap[key] = lastOffset
 			lastOffset += slabSize
 			
-
 		if not posList.has_key(key):
 			posList[keyList[i]] = [i]
 		else:
@@ -34,24 +35,42 @@ def dumpIndexMap(indexMap):
 def readIndexMap():
 	return cPickle.load(open("OffsetMap", "rb"))
 
-def mergePostingList(postingListForABatch, indexMap, slabSize, dumpedOnce):
+def mergePostingList(postingListForABatch, indexMap, slabSize, bookKeeping, lastDump):
 	fileObj = open("PostingList", "r+b")
 	for key in postingListForABatch:	
-		if dumpedOnce.has_key(key): 
-			fileObj.seek(indexMap[key], 0)
+		if lastDump.has_key(key): 
+			fileObj.seek(lastDump[key], 0)
 			try:
-				postingListForAWord = cPickle.load(fileObj)
+				fileContent = fileObj.read(slabSize).split('$')
+				postingListForAWord = cPickle.loads(fileContent[2])
 				postingListForAWord += postingListForABatch[key]
+				dumpString = cPickle.dumps(postingListForAWord)
+				if len(dumpString) + bookKeeping  < slabSize:
+					fileObj.seek(lastDump[key], 0)
+					fileObj.write(str(-1) + "$" + str(len(dumpString)) + "$")
+					fileObj.seek(lastDump[key] + bookKeeping, 0)
+					fileObj.write(dumpString)
+				else:
+					fileObj.seek(lastDump[key], 0)
+					lastDump[key] = increaseFileSize(slabSize)
+					fileObj.write(str(lastDump[key]) + "$" + fileContent[1] + "$")
+					postingListForAWord = postingListForABatch[key]
+					dumpString = cPickle.dumps(postingListForAWord)
+					fileObj.seek(lastDump[key], 0)
+					fileObj.write(str(-1) + "$" + str(len(dumpString)) + "$")
+					fileObj.seek(lastDump[key] + bookKeeping, 0)
+					fileObj.write(dumpString)
 			except (EOFError,cPickle.UnpicklingError):
 				continue
 		else:
-			increaseFileSize(slabSize)
-			dumpedOnce[key] = ""
+			lastDump[key] = indexMap[key]
 			postingListForAWord = postingListForABatch[key]
-			
-		fileObj.seek(indexMap[key], 0)
-		tempDump = cPickle.dumps(postingListForABatch[key])
-		fileObj.write(tempDump);
+			dumpString = cPickle.dumps(postingListForAWord)
+			fileObj.seek(lastDump[key], 0)
+			fileObj.write(str(-1) + "$" + str(len(dumpString)) + "$")
+			fileObj.seek(lastDump[key] + bookKeeping, 0)
+			fileObj.write(dumpString)
+
 	fileObj.close()
 
 def buildPostingListForABatch(postingListForABatch, postingListForAFile, docId):
@@ -79,22 +98,23 @@ if __name__ == "__main__":
 	# Tokenising the files to get a keyList
 	keyList = []
 	indexMap = {}
-	slabSize = 1000
+	bookKeeping = 50
+	slabSize = 6000 + bookKeeping
 	lastOffset = 0
-	dumpedOnce = {}
+	lastDump = {}
 	postingListForABatch = {}
-	for i in xrange(0, 1):
+	for i in xrange(0, 2):
 		postingListForAFile = {}
-		for j in xrange(0, 101):
-			fileObj = open("./" + str(i) + "/" + str(j), "rb")
+		for j in xrange(0, 50):
+			fileObj = open("./dataset/" + str(i) + "/" + str(j+50*i), "rb")
 			keyList = tokenize(fileObj)
 			fileObj.close()
 			postingListForAFile = {}
 			lastOffset = buildIndexMapAndPosList(keyList, indexMap, slabSize, lastOffset, postingListForAFile)
 			buildPostingListForABatch(postingListForABatch, postingListForAFile, j)
 			print "|keyList| = " + str(len(keyList))
-			print str(j) + "done"
-		mergePostingList(postingListForABatch, indexMap, slabSize, dumpedOnce)
+			print str(j+50*i) + "done"
+		mergePostingList(postingListForABatch, indexMap, slabSize, bookKeeping, lastDump)
 	# Dumping the index into a file
 	dumpIndexMap(indexMap)
 
