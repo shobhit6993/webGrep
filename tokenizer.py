@@ -26,8 +26,6 @@ def getStemmedWords(list):
     stemmer=PorterStemmer()
     return [stemmer.stem(x) for x in list]
 
-toks = getTokenListFromHtml("/home/harshil/Google.html")
-stemtoks = getStemmedWords(toks)
 
 
 
