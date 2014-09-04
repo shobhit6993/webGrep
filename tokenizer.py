@@ -2,10 +2,14 @@ import html2text
 import sys
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem import PorterStemmer
+from nltk.corpus import stopwords
+
 # Setting the encoding as utf-8
 reload(sys)
 sys.setdefaultencoding("utf-8")
-
+cachedStopWords = set(stopwords.words("english"))
+cachedStopWords.add("htm")
+cachedStopWords.add("html")
 
 def getHtml(path):
     h = html2text.HTML2Text()
@@ -26,8 +30,8 @@ def getStemmedWords(list):
     stemmer=PorterStemmer()
     return [stemmer.stem(x) for x in list]
 
-toks = getTokenListFromHtml("/home/harshil/Google.html")
-stemtoks = getStemmedWords(toks)
+def removeStopWords(list):
+	return [word for word in list if word not in cachedStopWords]
 
 
 
