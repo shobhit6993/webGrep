@@ -4,18 +4,28 @@ def tokenize(fileObj):
 	s = fileObj.read()
 	return s.split()
 
-def increaseFileSize(slaSize):
+def increaseFileSize(slabSize):
 	fileObj = open("PostingList","ab+")
-	for i in xrange(0,slaSize):
+	for i in xrange(0,slabSize):
 		fileObj.write('0')
 	fileObj.close()
 
-def buildIndexMap(keyList, indexMap, slaSize, lastOffset):
+def buildIndexMapAndPosList(keyList, indexMap, slabSize, lastOffset, posList):
+	i = 0
+	# posList = {}
 	for key in keyList:
 		if not indexMap.has_key(key):
 			indexMap[key] = lastOffset
-			lastOffset += slaSize
-			increaseFileSize(slaSize)
+			lastOffset += slabSize
+			increaseFileSize(slabSize)
+
+		if not posList.has_key(key):
+			posList[keyList[i]] = [i]
+		else:
+			posList[keyList[i]].append(i)
+
+		i += 1
+	# print posList
 	return lastOffset
 
 def dumpIndexMap(indexMap):
@@ -24,16 +34,7 @@ def dumpIndexMap(indexMap):
 def readIndexMap():
 	return cPickle.load(open("OffsetMap", "rb"))
 
-def createPostingListForAFile(keyList, indexMap):
-	posList = {}
-	for i in xrange( 0, len(keyList) ):
-		if posList.has_key(keyList[i]):
-			posList[keyList[i]].append(i)
-		else:
-			posList[keyList[i]] = [i]
-	return posList
-
-def mergePostingList(postingListForAFile, indexMap, docId, slaSize, dumpedOnce):
+def mergePostingList(postingListForAFile, indexMap, docId, slabSize, dumpedOnce):
 	fileObj = open("PostingList", "r+b")
 	for key in postingListForAFile:	
 		if dumpedOnce.has_key(key): 
@@ -72,19 +73,21 @@ if __name__ == "__main__":
 	# Tokenising the files to get a keyList
 	keyList = []
 	indexMap = {}
-	slaSize = 10000
+	slabSize = 10000
 	lastOffset = 0
 	dumpedOnce = {}
+	postingListForAFile = {}
 	for i in xrange(0, 1):
+		postingListForAFile = {}
 		for j in xrange(0, 101):
 			fileObj = open("./" + str(i) + "/" + str(j), "rb")
 			keyList = tokenize(fileObj)
 			fileObj.close()
-			lastOffset = buildIndexMap(keyList, indexMap, slaSize, lastOffset)
-			postingListForAFile = createPostingListForAFile(keyList, indexMap)
-			mergePostingList(postingListForAFile, indexMap, j, slaSize, dumpedOnce)
+			lastOffset = buildIndexMapAndPosList(keyList, indexMap, slabSize, lastOffset, postingListForAFile)
+			# print postingListForAFile
 			print "|keyList| = " + str(len(keyList))
 			print str(j) + "done"
+		mergePostingList(postingListForAFile, indexMap, j, slabSize, dumpedOnce)
 	
 	# Dumping the index into a file
 	dumpIndexMap(indexMap)
