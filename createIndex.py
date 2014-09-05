@@ -1,12 +1,15 @@
 import cPickle
 import tokenizer
 
+postingListFile = "PostingList"
+offsetMapFile = "OffsetMap"
+bookKeeping = 15
 # def tokenize(fileObj):
 # 	s = fileObj.read()
 # 	return s.split()
 
 def increaseFileSize(chunkSize):
-	fileObj = open("PostingList","ab")
+	fileObj = open(postingListFile,"ab")
 	retVal = fileObj.tell()
 	for i in xrange(0,chunkSize):
 		fileObj.write('0')
@@ -26,13 +29,13 @@ def buildPosList(keyList, posList):
 
 
 def dumpIndexMap(indexMap):
-	cPickle.dump(indexMap, open("OffsetMap", "wb"))
+	cPickle.dump(indexMap, open(offsetMapFile, "wb"))
 
 def readIndexMap():
-	return cPickle.load(open("OffsetMap", "rb"))
+	return cPickle.load(open(offsetMapFile, "rb"))
 
 def mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump):
-	fileObj = open("PostingList", "r+b")
+	fileObj = open(postingListFile, "r+b")
 	for key in postingListForABatch:	
 		if lastDump.has_key(key):
 			try:
@@ -45,12 +48,14 @@ def mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump):
 				fileObj.write(str(-1) + "$")
 				fileObj.seek(lastDump[key] + bookKeeping, 0)
 				fileObj.write(dumpString)
+				indexMap[key][1] += len(postingListForAWord)
 			except (EOFError,cPickle.UnpicklingError):
 				continue
 		else:
 			postingListForAWord = postingListForABatch[key]
 			dumpString = cPickle.dumps(postingListForAWord)
-			indexMap[key] = lastDump[key] = increaseFileSize(len(dumpString) + bookKeeping)
+			lastDump[key] = increaseFileSize(len(dumpString) + bookKeeping)
+			indexMap[key] = [lastDump[key], len(postingListForAWord)]
 			fileObj.seek(lastDump[key], 0)
 			fileObj.write(str(-1) + "$")
 			fileObj.seek(lastDump[key] + bookKeeping, 0)
@@ -66,37 +71,48 @@ def buildPostingListForABatch(postingListForABatch, postingListForAFile, docId):
 			postingListForABatch[key].append([docId, postingListForAFile[key]])
 
 def readPostingFile(indexMap):
-	fileObj = open("PostingList", "rb")
+	fileObj = open(postingListFile, "rb")
 	for key in indexMap:
-		fileObj.seek(indexMap[key]+bookKeeping, 0)
+		fileObj.seek(indexMap[key][0]+bookKeeping, 0)
 		try:
 			print cPickle.load(fileObj)
 		except(EOFError,cPickle.UnpicklingError):
 			continue
 	
 	fileObj.close()	
+
+def readIndexMap():
+	fileObj = open(offsetMapFile, "rb")
+	try:
+		return cPickle.load(fileObj)
+	except(EOFError,cPickle.UnpicklingError):
+		print "error"
+	
+	fileObj.close()	
 	
 
 if __name__ == "__main__":
-	fileObj = open("PostingList","wb")
+	fileObj = open(postingListFile,"wb")
 	fileObj.close()
 	# Tokenising the files to get a keyList
 	keyList = []
-	indexMap = {}
-	bookKeeping = 15
+	indexMap = {}	#indexMap key=word, and value is a list, whose 1st element=offest of posting list in file
+					#and second element is the doc freq of that word 
+	
 	lastDump = {}
 	for i in xrange(0, 10):
 		postingListForABatch = {}
-		for j in xrange(0, 1000):
-			keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(0) + "/" + str(1000*i+j))
+		for j in xrange(0, 10):
+			keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(0) + "/" + str(10*i+j))
 			postingListForAFile = {}
 			buildPosList(keyList, postingListForAFile)
-			buildPostingListForABatch(postingListForABatch, postingListForAFile, i)
+			buildPostingListForABatch(postingListForABatch, postingListForAFile, 10*i+j)
 			# print "|keyList| = " + str(len(keyList))
-			print str(1000*i+j)
+			print str(10*i+j)
 		mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump)
 		#print postingListForABatch
 	# Dumping the index into a file
 	dumpIndexMap(indexMap)
 
-	readPostingFile(indexMap)
+	# readPostingFile(indexMap)
+	print readIndexMap()
