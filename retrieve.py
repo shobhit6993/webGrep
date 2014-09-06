@@ -25,6 +25,7 @@ def getPostingList(initialOffset):
 	return postingListForTerm
 
 def convertToTuple(postingListForTerm):
+	postingListTuple = []
 	for node in postingListForTerm:
 		tempTuple = (node[0],len(node[1]))
 		postingListTuple.append(tempTuple)
@@ -34,14 +35,10 @@ def intersectionOfTupleList(list1, list2):
 	if len(list1) < len(list2):
 		list1, list2 = list2, list1
 
-	print list1
-	print list2
-
 	mergedList = []
 	i = 0
 	j = 0
 	while (j != len(list2)):
-		print str(i) + " " + str(j)
 		if list1[i][0] == list2[j][0]:
 			mergedList.append((list1[i][0], min(list1[i][1], list2[j][1])))
 			i += 1
@@ -90,6 +87,6 @@ if __name__ == "__main__":
 	print postingListForTerm
 
 	postingListTuple = convertToTuple(postingListForTerm)
-	
+	print postingListTuple
 
 	print sorted(postingListTuple,key=lambda x: x[1])[::-1]
