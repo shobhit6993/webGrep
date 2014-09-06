@@ -1,5 +1,6 @@
 import cPickle
 import tokenizer
+import threading
 
 postingListFile = "PostingList"
 offsetMapFile = "OffsetMap"
@@ -113,9 +114,10 @@ if __name__ == "__main__":
 	keyList = []
 	indexMap = {}	#indexMap key=word, and value is a list, whose 1st element=offest of posting list in file
 					#and second element is the doc freq of that word 
-	noOfBatches = 100
-	batchSize = 100
+	noOfBatches = 1
+	batchSize = 10000
 	lastDump = {}
+	threads = []
 	for flr in xrange(0,12):
 		if flr == 3: continue
 		for i in xrange(0, noOfBatches):
@@ -127,9 +129,20 @@ if __name__ == "__main__":
 				buildPostingListForABatch(postingListForABatch, postingListForAFile, flr*10000+batchSize*i+j)
 				# print "|keyList| = " + str(len(keyList))
 				print str(flr*10000+batchSize*i+j)
-			mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump)
+
+			for t in threads:
+				print 'join'
+				t.join()
+
+			t = threading.Thread(target=mergePostingList,args=(postingListForABatch, indexMap, bookKeeping, lastDump,))
+			t.start()
+			threads.append(t);
+			# mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump)
 			#print postingListForABatch
 	# Dumping the index into a file
+	for t in threads:
+		print 'join'
+		t.join()
 	dumpIndexMap(indexMap)
 
 	# readPostingFile(indexMap)
