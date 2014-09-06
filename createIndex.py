@@ -35,32 +35,39 @@ def dumpIndexMap(indexMap):
 # 	return cPickle.load(open(offsetMapFile, "rb"))
 
 def mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump):
+	tempFileObj = open(postingListFile,"ab")
+	initialFileEnd = tempFileObj.tell()
+	tempFileObj.close()
+
+	fileEnd = initialFileEnd
 	fileObj = open(postingListFile, "r+b")
+	stringToDump = ""
 	for key in postingListForABatch:	
 		if lastDump.has_key(key):
 			try:
 				fileObj.seek(lastDump[key], 0)
 				postingListForAWord = postingListForABatch[key]
 				dumpString = cPickle.dumps(postingListForAWord)
-				lastDump[key] = increaseFileSize(len(dumpString) + bookKeeping)
+				lastDump[key] = fileEnd
 				fileObj.write(str(lastDump[key]) + "$" )
-				fileObj.seek(lastDump[key], 0)
-				fileObj.write(str(-1) + "$")
-				fileObj.seek(lastDump[key] + bookKeeping, 0)
-				fileObj.write(dumpString)
+				tempString = str(-1) + "$";
+				stringToDump += tempString + '0'*(bookKeeping-len(tempString))
+				stringToDump += dumpString
 				indexMap[key][1] += len(postingListForAWord)
 			except (EOFError,cPickle.UnpicklingError):
 				continue
 		else:
 			postingListForAWord = postingListForABatch[key]
 			dumpString = cPickle.dumps(postingListForAWord)
-			lastDump[key] = increaseFileSize(len(dumpString) + bookKeeping)
+			lastDump[key] = fileEnd
+			tempString = str(-1) + "$";
+			stringToDump += tempString + '0'*(bookKeeping-len(tempString))
+			stringToDump += dumpString
 			indexMap[key] = [lastDump[key], len(postingListForAWord)]
-			fileObj.seek(lastDump[key], 0)
-			fileObj.write(str(-1) + "$")
-			fileObj.seek(lastDump[key] + bookKeeping, 0)
-			fileObj.write(dumpString)
+		fileEnd = initialFileEnd + len(stringToDump)
 
+	fileObj.seek(0,2)
+	fileObj.write(stringToDump)
 	fileObj.close()
 
 def buildPostingListForABatch(postingListForABatch, postingListForAFile, docId):
@@ -98,17 +105,18 @@ if __name__ == "__main__":
 	keyList = []
 	indexMap = {}	#indexMap key=word, and value is a list, whose 1st element=offest of posting list in file
 					#and second element is the doc freq of that word 
-	
+	batchSize = 10
+	noOfBatches = 10
 	lastDump = {}
-	for i in xrange(0, 10):
+	for i in xrange(0, noOfBatches):
 		postingListForABatch = {}
-		for j in xrange(0, 10):
-			keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(0) + "/" + str(10*i+j))
+		for j in xrange(0, batchSize):
+			keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(0) +"/" + str(batchSize*i+j))
 			postingListForAFile = {}
 			buildPosList(keyList, postingListForAFile)
-			buildPostingListForABatch(postingListForABatch, postingListForAFile, 10*i+j)
+			buildPostingListForABatch(postingListForABatch, postingListForAFile, batchSize*i+j)
 			# print "|keyList| = " + str(len(keyList))
-			print str(10*i+j)
+			print str(batchSize*i+j)
 		mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump)
 		#print postingListForABatch
 	# Dumping the index into a file

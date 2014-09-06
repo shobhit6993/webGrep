@@ -9,16 +9,16 @@ def getPostingList(initialOffset):
 	while nextOffest!=-1:
 		fileObj.seek(nextOffest,0)
 		book = fileObj.read(createIndex.bookKeeping)
-		print book
+		# print book
 		nextOffest = int(book.split('$')[0])
-		print nextOffest
+		# print nextOffest
 		retrievedList = []
 		try:
 			retrievedList = cPickle.load(fileObj)
 		except(EOFError,cPickle.UnpicklingError):
 			print "error"
 
-		print retrievedList
+		# print retrievedList
 		postingListForTerm += retrievedList
 		# postingListForTerm.update(retrievedList)
 	
@@ -27,9 +27,19 @@ def getPostingList(initialOffset):
 if __name__ == "__main__":
 	query = str(sys.argv[1])
 	indexMap = createIndex.readIndexMap()
+	postingListForTerm = []
 	if not indexMap.has_key(query):
 		print "No relevant docs found"
 	else:
-		print indexMap[query]
+		# print indexMap[query]
 		offset = indexMap[query][0]
-		print getPostingList(offset)
+		postingListForTerm = getPostingList(offset)
+	print postingListForTerm
+
+	postingListTuple = []
+	for node in postingListForTerm:
+		tempTuple = (node[0],len(node[1]))
+		postingListTuple.append(tempTuple)
+	print postingListTuple
+
+	print sorted(postingListTuple,key=lambda x: x[1])[::-1]
