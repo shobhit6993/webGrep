@@ -31,8 +31,8 @@ def buildPosList(keyList, posList):
 def dumpIndexMap(indexMap):
 	cPickle.dump(indexMap, open(offsetMapFile, "wb"))
 
-def readIndexMap():
-	return cPickle.load(open(offsetMapFile, "rb"))
+# def readIndexMap():
+# 	return cPickle.load(open(offsetMapFile, "rb"))
 
 def mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump):
 	fileObj = open(postingListFile, "r+b")
@@ -115,4 +115,4 @@ if __name__ == "__main__":
 	dumpIndexMap(indexMap)
 
 	# readPostingFile(indexMap)
-	print readIndexMap()
+	# print readIndexMap()
