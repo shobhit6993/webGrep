@@ -1,9 +1,10 @@
+import sys
 import cPickle
 import tokenizer
 import threading
 
-postingListFile = "PostingList"
-offsetMapFile = "OffsetMap"
+postingListFile = ""
+offsetMapFile = ""
 bookKeeping = 15
 # def tokenize(fileObj):
 # 	s = fileObj.read()
@@ -108,8 +109,8 @@ def readIndexMap():
 	
 
 if __name__ == "__main__":
-	fileObj = open(postingListFile,"wb")
-	fileObj.close()
+
+	
 	# Tokenising the files to get a keyList
 	keyList = []
 	indexMap = {}	#indexMap key=word, and value is a list, whose 1st element=offest of posting list in file
@@ -118,7 +119,16 @@ if __name__ == "__main__":
 	batchSize = 10000
 	lastDump = {}
 	threads = []
-	for flr in xrange(0,12):
+
+	stFlr = int(sys.argv[1])
+	enFlr = int(sys.argv[2])
+	exec 'postingListFile="PostingList"+`stFlr`' in globals()
+		# postingListFile = "PostingList"+`flr`
+	exec 'offsetMapFile="OffsetMap"+`stFlr`' in globals()
+	fileObj = open(postingListFile,"wb")
+	fileObj.close()
+	for flr in xrange(stFlr,enFlr):
+
 		if flr == 3: continue
 		for i in xrange(0, noOfBatches):
 			postingListForABatch = {}
@@ -134,10 +144,10 @@ if __name__ == "__main__":
 				print 'join'
 				t.join()
 
-			t = threading.Thread(target=mergePostingList,args=(postingListForABatch, indexMap, bookKeeping, lastDump,))
-			t.start()
-			threads.append(t);
-			# mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump)
+			# t = threading.Thread(target=mergePostingList,args=(postingListForABatch, indexMap, bookKeeping, lastDump,))
+			# t.start()
+			# threads.append(t);
+			mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump)
 			#print postingListForABatch
 	# Dumping the index into a file
 	for t in threads:

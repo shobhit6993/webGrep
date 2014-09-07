@@ -11,19 +11,35 @@ cachedStopWords = set(stopwords.words("english"))
 cachedStopWords.add("htm")
 cachedStopWords.add("html")
 
-# def getHtml(path):
-#     h = html2text.HTML2Text()
-#     h.ignore_links = True
-#     h.ignore_images = True
-#     file = open(path, "r")
-#     inp = file.read()
-#     inp = unicode(inp, errors='ignore')
-#     return h.handle(inp)
 def getHtml(path):
-	file = open(path,"r")
-	inp = file.read()
+	try:
+		file = open(path,"r")
+	except Exception, e:
+		return ""
+
+	out = nltk.clean_html(file.read())
 	file.close()
-	return nltk.clean_html(inp)
+
+	return out
+
+# def getHtml(path):
+	# try:
+	# 	file = open(path,"r")
+	# except Exception, e:
+	# 	return ""
+	
+	# html = file.read()
+	# file.close()
+
+# 	soup = BeautifulSoup(html)
+# 	# kill all script and style elements
+# 	for script in soup(["script", "style"]):
+# 		script.extract()    # rip it out
+# 	# get text
+# 	text = soup.get_text()
+# 	# break into lines and remove leading and trailing space on each
+# 	return text
+	 
 
 def getTokenListFromHtml(path):
     inp = getHtml(path)
