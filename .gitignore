@@ -5,6 +5,7 @@ OffsetMap
 PostingList
 test.py
 dataset/
+indexed/
 0/
 test.py
 dummyDataset/
