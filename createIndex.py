@@ -2,8 +2,8 @@ import sys
 import cPickle
 import tokenizer
 
-postingListFile = ""
-offsetMapFile = ""
+postingListFile = "./indexed/PostingList"
+offsetMapFile = "./indexed/OffsetMap"
 bookKeeping = 15
 # def tokenize(fileObj):
 # 	s = fileObj.read()
@@ -120,9 +120,9 @@ if __name__ == "__main__":
 	
 	stFlr = int(sys.argv[1])
 	enFlr = int(sys.argv[2])
-	exec 'postingListFile="PostingList"+`stFlr`' in globals()
+	# exec 'postingListFile="./indexed/PostingList"+`stFlr`' in globals()
 		# postingListFile = "PostingList"+`flr`
-	exec 'offsetMapFile="OffsetMap"+`stFlr`' in globals()
+	# exec 'offsetMapFile="./indexed/OffsetMap"+`stFlr`' in globals()
 	fileObj = open(postingListFile,"wb")
 	fileObj.close()
 	for flr in xrange(stFlr,enFlr):
