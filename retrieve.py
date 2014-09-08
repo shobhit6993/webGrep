@@ -32,13 +32,10 @@ def convertToTuple(postingListForTerm):
 	return postingListTuple
 
 def intersectionOfTupleList(list1, list2):
-	if len(list1) < len(list2):
-		list1, list2 = list2, list1
-
 	mergedList = []
 	i = 0
 	j = 0
-	while (j != len(list2)):
+	while i != len(list1) and j != len(list2):
 		if list1[i][0] == list2[j][0]:
 			mergedList.append((list1[i][0], min(list1[i][1], list2[j][1])))
 			i += 1
@@ -51,16 +48,16 @@ def intersectionOfTupleList(list1, list2):
 	return mergedList
 
 def unionOfTupleList(list1, list2):
-	if len(list1) < len(list2):
-		list1, list2 = list2, list1
-
 	mergedList = []
 	i = 0
 	j = 0
-	while (i != len(list1)):
+	while i != len(list1) or j != len(list2):
 		if j == len(list2):
 			mergedList.append(list1[i])
 			i += 1
+		elif i == len(list1):
+			mergedList.append(list2[j])
+			j += 1
 		elif list1[i][0] == list2[j][0]:
 			mergedList.append((list1[i][0], list1[i][1] + list2[j][1]))
 			i += 1
@@ -73,6 +70,39 @@ def unionOfTupleList(list1, list2):
 			j += 1
 
 	return mergedList
+	
+def mergePhrasalLists(list1, list2):
+	i = 0
+	j = 0
+	mergedList = []
+	while i != len(list1) and j != len(list2):
+		if list1[i][0] < list2[j][0]:
+			i += 1
+		elif list1[i][0] > list2[j][0]:
+			j += 1
+		else:
+			tempList = [list1[i][0], []]
+			flag = False
+			k = 0
+			l = 0
+			while k != len(list1[i][1]) and l != len(list2[j][1]):
+				if list1[i][1][k] + 1 < list2[j][1][l]:
+					k += 1
+				elif list1[i][1][k] + 1 > list2[j][1][l]:
+					l += 1
+				else:
+					flag = True
+					tempList[1].append(list2[j][1][l])
+					k += 1
+					l += 1
+					
+			if flag:
+				mergedList.append(tempList)
+			
+			i += 1
+			j += 1
+
+	return mergedList	
 
 if __name__ == "__main__":
 	query = str(sys.argv[1])
