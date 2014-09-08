@@ -63,7 +63,10 @@ def getStemmedWords(list):
 def removeStopWords(list):
 	return [word for word in list if word not in cachedStopWords]
 
-
+def getStemmedTokensFromHtml(path):
+	inp = getHtml(path)
+	tokenizer = RegexpTokenizer(r'\w+')
+	return getStemmedWords([x.lower() for x in tokenizer.tokenize(inp)])
 
 
 
