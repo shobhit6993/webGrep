@@ -20,18 +20,19 @@ cachedStopWords.add("html")
 
 def getHtml(path):
 	try:
-		file = open(path,"r")
+		fileObj = open(path,"r")
 	except Exception, e:
 		return ""
-	signal.alarm(10)
+	# signal.alarm(10)
 	try:
-		out = nltk.clean_html(file.read())
+		out = nltk.clean_html(fileObj.read())
 	except Exception, e:
-		file.close()
-		signal.alarm(0)
+		fileObj.close()
+		# signal.alarm(0)
 		return ""
-	signal.alarm(0)
-	file.close()
+
+	# signal.alarm(0)
+	fileObj.close()
 	return out
 
 # def getHtml(path):
@@ -69,6 +70,13 @@ def getStemmedTokensFromHtml(path):
 	inp = getHtml(path)
 	tokenizer = RegexpTokenizer(r'\w+')
 	return getStemmedWords([x.lower() for x in tokenizer.tokenize(inp)])
+
+def getTokensStopWordsRemovedFromHtml(path):
+	inp = getHtml(path)
+	tokenizer = RegexpTokenizer(r'\w+')
+	return [x.lower() for x in tokenizer.tokenize(inp) if x.lower() not in cachedStopWords]
+
+
 
 
 

@@ -30,7 +30,10 @@ def buildPosList(keyList, posList):
 
 
 def dumpIndexMap(indexMap):
-	cPickle.dump(indexMap, open(offsetMapFile, "wb"))
+	fileObj = open(offsetMapFile, "wb")
+	cPickle.dump(indexMap, fileObj )
+	fileObj.close()
+
 
 # def readIndexMap():
 # 	return cPickle.load(open(offsetMapFile, "rb"))
@@ -41,7 +44,7 @@ def mergePostingList(postingListForABatch, indexMap, bookKeeping):
 	tempFileObj.close()
 
 	fileEnd = initialFileEnd
-	fileObj = open(postingListFile, "r+b")
+	
 	strList = []
 	for key in postingListForABatch:
 		size = 0
@@ -60,7 +63,8 @@ def mergePostingList(postingListForABatch, indexMap, bookKeeping):
 		strList.append(dumpString)
 		size += len(strList[-1])
 		fileEnd += size
-
+		
+	fileObj = open(postingListFile, "r+b")
 	fileObj.seek(0,2)
 	stringToDump = ''.join(strList)
 	fileObj.write(stringToDump)
@@ -118,7 +122,7 @@ if __name__ == "__main__":
 			postingListForABatch = {}
 			for j in xrange(0, batchSize):
 				# keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
-				keyList = tokenizer.getStemmedTokensFromHtml("./dataset/" + str(flr) + "/" + str(flr*10000+batchSize*i+j))
+				keyList = tokenizer.getTokensStopWordsRemovedFromHtml("./dataset/" + str(flr) + "/" + str(flr*10000+batchSize*i+j))
 				# print keyList
 				postingListForAFile = {}
 				buildPosList(keyList, postingListForAFile)
