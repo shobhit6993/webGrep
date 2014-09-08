@@ -1,4 +1,3 @@
-import html2text
 import sys
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem import PorterStemmer

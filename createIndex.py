@@ -1,7 +1,6 @@
 import sys
 import cPickle
 import tokenizer
-import threading
 
 postingListFile = ""
 offsetMapFile = ""
@@ -118,8 +117,7 @@ if __name__ == "__main__":
 	noOfBatches = 1
 	batchSize = 10000
 	lastDump = {}
-	threads = []
-
+	
 	stFlr = int(sys.argv[1])
 	enFlr = int(sys.argv[2])
 	exec 'postingListFile="PostingList"+`stFlr`' in globals()
@@ -140,20 +138,8 @@ if __name__ == "__main__":
 				# print "|keyList| = " + str(len(keyList))
 				print str(flr*10000+batchSize*i+j)
 
-			for t in threads:
-				print 'join'
-				t.join()
-
-			# t = threading.Thread(target=mergePostingList,args=(postingListForABatch, indexMap, bookKeeping, lastDump,))
-			# t.start()
-			# threads.append(t);
 			mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump)
-			#print postingListForABatch
 	# Dumping the index into a file
-	for t in threads:
-		print 'join'
-		t.join()
 	dumpIndexMap(indexMap)
-
 	# readPostingFile(indexMap)
 	# print readIndexMap()
