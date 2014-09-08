@@ -4,6 +4,7 @@ __pycache__/
 OffsetMap
 PostingList
 test.py
+indexed/
 dataset/
 indexed/
 0/

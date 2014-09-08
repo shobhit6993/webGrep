@@ -37,7 +37,7 @@ def p_expression_term(p):
 
 def p_expression_quotes(p):
 	'expression : QUOTE phrasal QUOTE'
-	p[0] = convertToTuple(p[2])
+	p[0] = retrieve.convertToTuple(p[2])
 
 def p_phrasal_term(p):
 	'phrasal : TERM'
@@ -49,8 +49,8 @@ def p_phrasal_term(p):
 	
 def p_phrasal_phrase(p):
 	'phrasal : phrasal TERM'
-	if indexMap.has_key(p[1]):
-		offset = indexMap[p[1]][0]
+	if indexMap.has_key(p[2]):
+		offset = indexMap[p[2]][0]
 		postingListForTerm = retrieve.getPostingList(offset)
 	else:
 		postingListForTerm = []

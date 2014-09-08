@@ -1,10 +1,9 @@
 import sys
 import cPickle
 import tokenizer
-import threading
 
-postingListFile = ""
-offsetMapFile = ""
+postingListFile = "./indexed/PostingList"
+offsetMapFile = "./indexed/OffsetMap"
 bookKeeping = 15
 # def tokenize(fileObj):
 # 	s = fileObj.read()
@@ -118,13 +117,12 @@ if __name__ == "__main__":
 	noOfBatches = 1
 	batchSize = 10000
 	lastDump = {}
-	threads = []
-
+	
 	stFlr = int(sys.argv[1])
 	enFlr = int(sys.argv[2])
-	exec 'postingListFile="PostingList"+`stFlr`' in globals()
+	# exec 'postingListFile="./indexed/PostingList"+`stFlr`' in globals()
 		# postingListFile = "PostingList"+`flr`
-	exec 'offsetMapFile="OffsetMap"+`stFlr`' in globals()
+	# exec 'offsetMapFile="./indexed/OffsetMap"+`stFlr`' in globals()
 	fileObj = open(postingListFile,"wb")
 	fileObj.close()
 	for flr in xrange(stFlr,enFlr):
@@ -133,27 +131,16 @@ if __name__ == "__main__":
 		for i in xrange(0, noOfBatches):
 			postingListForABatch = {}
 			for j in xrange(0, batchSize):
-				keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
+				# keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
+				keyList = tokenizer.getStemmedTokensFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
 				postingListForAFile = {}
 				buildPosList(keyList, postingListForAFile)
 				buildPostingListForABatch(postingListForABatch, postingListForAFile, flr*10000+batchSize*i+j)
 				# print "|keyList| = " + str(len(keyList))
 				print str(flr*10000+batchSize*i+j)
 
-			for t in threads:
-				print 'join'
-				t.join()
-
-			# t = threading.Thread(target=mergePostingList,args=(postingListForABatch, indexMap, bookKeeping, lastDump,))
-			# t.start()
-			# threads.append(t);
 			mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump)
-			#print postingListForABatch
 	# Dumping the index into a file
-	for t in threads:
-		print 'join'
-		t.join()
 	dumpIndexMap(indexMap)
-
 	# readPostingFile(indexMap)
 	# print readIndexMap()
