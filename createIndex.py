@@ -133,7 +133,8 @@ if __name__ == "__main__":
 		for i in xrange(0, noOfBatches):
 			postingListForABatch = {}
 			for j in xrange(0, batchSize):
-				keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
+				# keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
+				keyList = tokenizer.getStemmedTokensFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
 				postingListForAFile = {}
 				buildPosList(keyList, postingListForAFile)
 				buildPostingListForABatch(postingListForABatch, postingListForAFile, flr*10000+batchSize*i+j)
