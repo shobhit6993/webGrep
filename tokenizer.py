@@ -28,8 +28,10 @@ def getHtml(path):
 		out = nltk.clean_html(file.read())
 	except Exception, e:
 		file.close()
+		signal.alarm(0)
 		return ""
 	signal.alarm(0)
+	file.close()
 	return out
 
 # def getHtml(path):
