@@ -3,6 +3,14 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 import nltk
+import signal
+
+
+def handler(signum, frame):
+	raise Exception("timeout")
+
+signal.signal(signal.SIGALRM, handler)
+
 # Setting the encoding as utf-8
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -15,10 +23,13 @@ def getHtml(path):
 		file = open(path,"r")
 	except Exception, e:
 		return ""
-
-	out = nltk.clean_html(file.read())
-	file.close()
-
+	signal.alarm(10)
+	try:
+		out = nltk.clean_html(file.read())
+	except Exception, e:
+		file.close()
+		return ""
+	signal.alarm(0)
 	return out
 
 # def getHtml(path):
