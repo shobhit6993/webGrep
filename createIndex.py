@@ -2,20 +2,13 @@ import sys
 import cPickle
 import tokenizer
 
-postingListFile = "PostingList"
-offsetMapFile = "OffsetMap"
+postingListFile = "./indexed/PostingList"
+offsetMapFile = "./indexed/OffsetMap"
 bookKeeping = 15
 # def tokenize(fileObj):
 # 	s = fileObj.read()
 # 	return s.split()
 
-def increaseFileSize(chunkSize):
-	fileObj = open(postingListFile,"ab")
-	retVal = fileObj.tell()
-	for i in xrange(0,chunkSize):
-		fileObj.write('0')
-	fileObj.close()
-	return retVal
 
 def buildPosList(keyList, posList):
 	i = 0
@@ -120,9 +113,9 @@ if __name__ == "__main__":
 		if flr == 3: continue
 		for i in xrange(0, noOfBatches):
 			postingListForABatch = {}
-			for j in xrange(0, batchSize):
+			for j in xrange(batchSize-1, -1, -1):
 				# keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
-				keyList = tokenizer.getTokensStopWordsRemovedFromHtml("./dataset/" + str(flr) + "/" + str(flr*10000+batchSize*i+j))
+				keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) + "/" + str(flr*10000+batchSize*i+j))
 				# print keyList
 				postingListForAFile = {}
 				buildPosList(keyList, postingListForAFile)
