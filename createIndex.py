@@ -2,8 +2,8 @@ import sys
 import cPickle
 import tokenizer
 
-postingListFile = "./indexed/PostingList"
-offsetMapFile = "./indexed/OffsetMap"
+postingListFile = "PostingList"
+offsetMapFile = "OffsetMap"
 bookKeeping = 15
 # def tokenize(fileObj):
 # 	s = fileObj.read()
@@ -35,7 +35,7 @@ def dumpIndexMap(indexMap):
 # def readIndexMap():
 # 	return cPickle.load(open(offsetMapFile, "rb"))
 
-def mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump):
+def mergePostingList(postingListForABatch, indexMap, bookKeeping):
 	tempFileObj = open(postingListFile,"ab")
 	initialFileEnd = tempFileObj.tell()
 	tempFileObj.close()
@@ -44,34 +44,21 @@ def mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump):
 	fileObj = open(postingListFile, "r+b")
 	strList = []
 	for key in postingListForABatch:
-		size = 0	
-		if lastDump.has_key(key):
-			try:
-				fileObj.seek(lastDump[key], 0)
-				postingListForAWord = postingListForABatch[key]
-				dumpString = cPickle.dumps(postingListForAWord)
-				lastDump[key] = fileEnd
-				fileObj.write(str(lastDump[key]) + "$" )
-				tempString = str(-1) + "$";
-				strList.append(tempString + '0'*(bookKeeping-len(tempString)))
-				size += len(strList[-1])
-				strList.append(dumpString)
-				size += len(strList[-1])
-				indexMap[key][1] += len(postingListForAWord)
-			except (EOFError,cPickle.UnpicklingError):
-				continue
+		size = 0
+		postingListForAWord = postingListForABatch[key]
+		dumpString = cPickle.dumps(postingListForAWord)
+		if indexMap.has_key(key):
+			tempString = str(indexMap[key][0]) + "$";
+			indexMap[key][0] = fileEnd
+			indexMap[key][1] += len(postingListForAWord)
 		else:
-			postingListForAWord = postingListForABatch[key]
-			dumpString = cPickle.dumps(postingListForAWord)
-			lastDump[key] = fileEnd
 			tempString = str(-1) + "$";
-			strList.append(tempString + '0'*(bookKeeping-len(tempString)))
-			size += len(strList[-1])
-			strList.append(dumpString)
-			size += len(strList[-1])
-			indexMap[key] = [lastDump[key], len(postingListForAWord)]
+			indexMap[key] = [fileEnd, len(postingListForAWord)]
 		
-
+		strList.append(tempString + '0'*(bookKeeping-len(tempString)))
+		size += len(strList[-1])
+		strList.append(dumpString)
+		size += len(strList[-1])
 		fileEnd += size
 
 	fileObj.seek(0,2)
@@ -116,7 +103,6 @@ if __name__ == "__main__":
 					#and second element is the doc freq of that word 
 	noOfBatches = 1
 	batchSize = 10000
-	lastDump = {}
 	
 	stFlr = int(sys.argv[1])
 	enFlr = int(sys.argv[2])
@@ -132,14 +118,15 @@ if __name__ == "__main__":
 			postingListForABatch = {}
 			for j in xrange(0, batchSize):
 				# keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
-				keyList = tokenizer.getStemmedTokensFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
+				keyList = tokenizer.getStemmedTokensFromHtml("./dataset/" + str(flr) + "/" + str(flr*10000+batchSize*i+j))
+				# print keyList
 				postingListForAFile = {}
 				buildPosList(keyList, postingListForAFile)
 				buildPostingListForABatch(postingListForABatch, postingListForAFile, flr*10000+batchSize*i+j)
 				# print "|keyList| = " + str(len(keyList))
 				print str(flr*10000+batchSize*i+j)
 
-			mergePostingList(postingListForABatch, indexMap, bookKeeping, lastDump)
+			mergePostingList(postingListForABatch, indexMap, bookKeeping)
 	# Dumping the index into a file
 	dumpIndexMap(indexMap)
 	# readPostingFile(indexMap)
