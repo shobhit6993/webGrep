@@ -19,6 +19,7 @@ def p_expression_or(p):
 	
 def p_expression_expterm(p):
 	'expression : expression TERM'
+	p[2] = p[2].lower()
 	if indexMap.has_key(p[2]):
 		offset = indexMap[p[2]][0]
 		postingListForTerm = retrieve.getPostingList(offset)
@@ -28,6 +29,7 @@ def p_expression_expterm(p):
 	
 def p_expression_term(p):
 	'expression : TERM'
+	p[1] = p[1].lower()
 	if indexMap.has_key(p[1]):
 		offset = indexMap[p[1]][0]
 		postingListForTerm = retrieve.getPostingList(offset)
@@ -41,6 +43,7 @@ def p_expression_quotes(p):
 
 def p_phrasal_term(p):
 	'phrasal : TERM'
+	p[1] = p[1].lower()
 	if indexMap.has_key(p[1]):
 		offset = indexMap[p[1]][0]
 		p[0] = retrieve.getPostingList(offset)
@@ -49,6 +52,7 @@ def p_phrasal_term(p):
 	
 def p_phrasal_phrase(p):
 	'phrasal : phrasal TERM'
+	p[2] = p[2].lower()
 	if indexMap.has_key(p[2]):
 		offset = indexMap[p[2]][0]
 		postingListForTerm = retrieve.getPostingList(offset)
