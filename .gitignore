@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 parser.out
+DocLenMap
 parsetab.py
 OffsetMap
 indexed_0_100_stemmed_stopRetained/
