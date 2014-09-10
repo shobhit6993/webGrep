@@ -92,15 +92,6 @@ def readPostingFile(indexMap):
 
 def readIndexMap():
 	fileObj = open(offsetMapFile, "rb")
-	try:
-		return cPickle.load(fileObj)
-	except(EOFError,cPickle.UnpicklingError):
-		print "error"
-	
-	fileObj.close()	
-
-def readIndexMapSelf():
-	fileObj = open(offsetMapFile, "rb")
 	strList = fileObj.read()
 	fileObj.close()
 
@@ -138,7 +129,7 @@ if __name__ == "__main__":
 			postingListForABatch = {}
 			for j in xrange(batchSize-1, -1, -1):
 				# keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
-				keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) + "/" + str(flr*10000+batchSize*i+j))
+				keyList = tokenizer.getTokenListFromHtml("./dataset/"+ str(flr)+"/"+str(flr*10000+batchSize*i+j))
 				# print keyList
 				postingListForAFile = {}
 				buildPosList(keyList, postingListForAFile)
@@ -151,4 +142,4 @@ if __name__ == "__main__":
 	# dumpIndexMap(indexMap)
 	dumpIndexMapSelf(indexMap)
 	# readPostingFile(indexMap)
-	# print readIndexMapSelf()
+	# print readIndexMap()

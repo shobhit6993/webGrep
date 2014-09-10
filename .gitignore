@@ -1,6 +1,8 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+parser.out
+parsetab.py
 OffsetMap
 PostingList
 test.py
