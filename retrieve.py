@@ -1,6 +1,6 @@
 import cPickle
 import sys
-from createIndex import postingListFile, bookKeeping, readIndexMap
+from createIndex import postingListFile, bookKeeping, readIndexMapSelf
 
 def getPostingList(initialOffset):
 	fileObj = open(postingListFile,"rb")
@@ -106,7 +106,7 @@ def mergePhrasalLists(list1, list2):
 
 if __name__ == "__main__":
 	query = str(sys.argv[1])
-	indexMap = readIndexMap()
+	indexMap = readIndexMapSelf()
 	postingListForTerm = []
 	if not indexMap.has_key(query):
 		print "No relevant docs found"
