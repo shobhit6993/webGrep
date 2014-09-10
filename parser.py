@@ -69,7 +69,7 @@ def p_error(p):
 parser = yacc.yacc()
 
 t1 = time.time()
-indexMap = retrieve.readIndexMapSelf()
+indexMap = retrieve.readIndexMap()
 print "Time to load indexMap = " +str(time.time() - t1)
     
 while True:
@@ -83,7 +83,7 @@ while True:
    result = parser.parse(s)
    result.sort(key=lambda x: x[1], reverse=True)
    # sorted(result,key=lambda x: x[1])[::-1]
-   for i in xrange(1,100):
+   for i in xrange(1,min(100,len(result))):
    	print result[i]
    # print result
    print "Time for query = " +str(time.time() - t1)
