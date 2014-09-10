@@ -27,7 +27,16 @@ def dumpIndexMap(indexMap):
 	cPickle.dump(indexMap, fileObj )
 	fileObj.close()
 
-
+def dumpIndexMapSelf(indexMap):
+	strList = []
+	for key in indexMap:
+		strList.append(key + ":"+str(indexMap[key][0])+":"+str(indexMap[key][1])+",")
+	# strList.append("$")
+	stringToDump = ''.join(strList)
+	# print stringToDump
+	fileObj = open(offsetMapFile, "wb")
+	fileObj.write(stringToDump)
+	fileObj.close()
 # def readIndexMap():
 # 	return cPickle.load(open(offsetMapFile, "rb"))
 
@@ -89,8 +98,22 @@ def readIndexMap():
 		print "error"
 	
 	fileObj.close()	
-	
 
+def readIndexMapSelf():
+	fileObj = open(offsetMapFile, "rb")
+	strList = fileObj.read()
+	fileObj.close()
+
+	indexMap = {}
+	arr = strList.split(",")
+	# print arr
+	for element in arr:
+		if element == '':
+			break
+
+		triple = element.split(":")
+		indexMap[triple[0]] = [int(triple[1]), int(triple[2])]
+	return indexMap
 if __name__ == "__main__":
 
 	
@@ -125,6 +148,7 @@ if __name__ == "__main__":
 
 			mergePostingList(postingListForABatch, indexMap, bookKeeping)
 	# Dumping the index into a file
-	dumpIndexMap(indexMap)
+	# dumpIndexMap(indexMap)
+	dumpIndexMapSelf(indexMap)
 	# readPostingFile(indexMap)
-	# print readIndexMap()
+	# print readIndexMapSelf()

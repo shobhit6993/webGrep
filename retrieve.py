@@ -1,6 +1,6 @@
 import cPickle
 import sys
-from createIndex import postingListFile, bookKeeping, readIndexMap
+from createIndex import postingListFile, bookKeeping, readIndexMapSelf
 
 def getPostingList(initialOffset):
 	fileObj = open(postingListFile,"rb")
@@ -40,7 +40,7 @@ def intersectionOfTupleList(list1, list2):
 			mergedList.append((list1[i][0], min(list1[i][1], list2[j][1])))
 			i += 1
 			j += 1
-		elif list1[i][0] < list2[j][0]:
+		elif list1[i][0] > list2[j][0]:
 			i += 1
 		else:
 			j += 1
@@ -62,7 +62,7 @@ def unionOfTupleList(list1, list2):
 			mergedList.append((list1[i][0], list1[i][1] + list2[j][1]))
 			i += 1
 			j += 1
-		elif list1[i][0] < list2[j][0]:
+		elif list1[i][0] > list2[j][0]:
 			mergedList.append(list1[i])
 			i += 1
 		else:
@@ -76,9 +76,9 @@ def mergePhrasalLists(list1, list2):
 	j = 0
 	mergedList = []
 	while i != len(list1) and j != len(list2):
-		if list1[i][0] < list2[j][0]:
+		if list1[i][0] > list2[j][0]:
 			i += 1
-		elif list1[i][0] > list2[j][0]:
+		elif list1[i][0] < list2[j][0]:
 			j += 1
 		else:
 			tempList = [list1[i][0], []]
@@ -106,7 +106,7 @@ def mergePhrasalLists(list1, list2):
 
 if __name__ == "__main__":
 	query = str(sys.argv[1])
-	indexMap = readIndexMap()
+	indexMap = readIndexMapSelf()
 	postingListForTerm = []
 	if not indexMap.has_key(query):
 		print "No relevant docs found"
