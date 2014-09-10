@@ -107,16 +107,16 @@ def mergePhrasalLists(list1, list2):
 if __name__ == "__main__":
 	query = str(sys.argv[1])
 	indexMap = readIndexMapSelf()
-	postingListForTerm = []
-	if not indexMap.has_key(query):
-		print "No relevant docs found"
-	else:
-		# print indexMap[query]
-		offset = indexMap[query][0]
-		postingListForTerm = getPostingList(offset)
-	print postingListForTerm
+	# postingListForTerm = []
+	# if not indexMap.has_key(query):
+	# 	print "No relevant docs found"
+	# else:
+	# 	# print indexMap[query]
+	# 	offset = indexMap[query][0]
+	# 	postingListForTerm = getPostingList(offset)
+	# print postingListForTerm
 
-	postingListTuple = convertToTuple(postingListForTerm)
-	print postingListTuple
+	# postingListTuple = convertToTuple(postingListForTerm)
+	# print postingListTuple
 
-	print sorted(postingListTuple,key=lambda x: x[1])[::-1]
+	# print sorted(postingListTuple,key=lambda x: x[1])[::-1]

@@ -4,6 +4,7 @@ __pycache__/
 parser.out
 parsetab.py
 OffsetMap
+indexed_0_100_stemmed_stopRetained/
 PostingList
 test.py
 indexed/

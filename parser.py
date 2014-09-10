@@ -1,6 +1,7 @@
 import ply.yacc as yacc
 from lexer import tokens
 import retrieve
+import time
 
 def p_expression_paren(p):
 	'expression : LPAREN expression RPAREN'
@@ -67,13 +68,22 @@ def p_error(p):
 # Build the parser
 parser = yacc.yacc()
 
-indexMap = retrieve.readIndexMap()
+t1 = time.time()
+indexMap = retrieve.readIndexMapSelf()
+print "Time to load indexMap = " +str(time.time() - t1)
     
 while True:
+   
    try:
        s = raw_input('Enter your query: ')
    except EOFError:
        break
    if not s: continue
+   t1 = time.time()
    result = parser.parse(s)
-   print result
+   result.sort(key=lambda x: x[1], reverse=True)
+   # sorted(result,key=lambda x: x[1])[::-1]
+   for i in xrange(1,100):
+   	print result[i]
+   # print result
+   print "Time for query = " +str(time.time() - t1)
