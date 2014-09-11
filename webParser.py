@@ -2,7 +2,8 @@ import ply.yacc as yacc
 from lexer import tokens
 import retrieve
 import time
-from docLen import readDocLenMap 
+import json
+# from docLen import readDocLenMap 
 
 def p_expression_paren(p):
 	'expression : LPAREN expression RPAREN'
@@ -71,10 +72,7 @@ def query(p):
 	result = parser.parse(p)
 	result.sort(key=lambda x: x[1], reverse=True)
 	# sorted(result,key=lambda x: x[1])[::-1]
-	strList = [];
-	for i in xrange(1,min(100,len(result))):
-		strList.append(`result[i][0]`+"-"+`result[i][1]`)
-	return '\n'.join(strList)
+	return json.dumps(result)
 
 # Build the parser
 parser = yacc.yacc()

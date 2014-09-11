@@ -2,7 +2,7 @@ import sys
 import cPickle
 import tokenizer
 
-indexFolder = "./indexed/indexed_0_161_notStemmed_stopRetained/"
+indexFolder = "./indexed/"
 postingListFile = indexFolder + "PostingList"
 offsetMapFile = indexFolder + "OffsetMap"
 bookKeeping = 15
