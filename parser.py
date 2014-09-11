@@ -3,6 +3,13 @@ from lexer import tokens
 import retrieve
 import time
 
+precedence = (
+    ('left', 'OR'),
+    ('left', 'AND'),
+	('left', 'QUOTE'),
+    ('left', 'LPAREN', 'RPAREN'),
+)
+
 def p_expression_paren(p):
 	'expression : LPAREN expression RPAREN'
 	p[0] = p[2]

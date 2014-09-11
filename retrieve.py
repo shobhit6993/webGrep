@@ -31,6 +31,14 @@ def convertToTuple(postingListForTerm):
 		postingListTuple.append(tempTuple)
 	return postingListTuple
 
+def convertToTfIdfTuple(postingListForTerm, relevantDocs, totalDocs):
+	postingListTuple = []
+	idf = log(totalDocs / relevantDocs)
+	for node in postingListForTerm:
+		tempTuple = (node[0], len(node[1]) * idf)
+		postingListTuple.append(tempTuple)
+	return postingListTuple
+
 def intersectionOfTupleList(list1, list2):
 	mergedList = []
 	i = 0
@@ -68,7 +76,7 @@ def unionOfTupleList(list1, list2):
 		else:
 			mergedList.append(list2[j])
 			j += 1
-
+	
 	return mergedList
 	
 def mergePhrasalLists(list1, list2):
