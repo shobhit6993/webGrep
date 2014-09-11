@@ -1,49 +1,48 @@
-docLenMapFile = "DocLenMap"
-noOfFiles = 100
+docLenListFile = "DocLenList"
+noOfFiles = 10000
 stFlr = 0
-enFlr = 0
+enFlr = 1
 
-def readDocLenMap():
-	fileObj = open(docLenMapFile, "rb")
+def readDocLenList():
+	fileObj = open(docLenListFile, "rb")
 	strList = fileObj.read()
 	fileObj.close()
 
-	docLenMap = {}
+	docLenList = []
 	arr = strList.split(",")
 	# print arr
 	for element in arr:
 		if element == '':
 			break
 
-		pair = element.split(":")
-		docLenMap[int(pair[0])] = int(pair[1])
-	return docLenMap
+		docLenList.append(int(element))
+	return docLenList
 
-def buildDocLenMap():
-	docLenMap = {}
+def buildDocLenList():
+	docLenList = []
 	for flr in xrange(stFlr,enFlr+1):
 		if flr == 3: continue
 		for i in xrange(0, noOfFiles):
 				fileObj = open("./dataset/"+ str(flr)+"/"+str(flr*noOfFiles+i),"ab")
 				# print  str(flr*noOfFiles+i)
-				docLenMap[flr*noOfFiles+i] = int(fileObj.tell())
+				docLenList.append(int(fileObj.tell()))
 				fileObj.close()
-	return docLenMap
+	return docLenList
 
-def dumpDocLenMap(docLenMap):
+def dumpDocLenList(docLenList):
 	strList = []
-	for key in docLenMap:
-		strList.append(str(key) + ":"+str(docLenMap[key])+",")
+	for elem in docLenList:
+		strList.append(str(elem)+",")
 	# strList.append("$")
 	stringToDump = ''.join(strList)
-	fileObj = open(docLenMapFile, "wb")
+	fileObj = open(docLenListFile, "wb")
 	fileObj.write(stringToDump)
 	fileObj.close()
 
 	
 if __name__ == "__main__":
-	docLenMap = buildDocLenMap()
-	# print docLenMap
-	dumpDocLenMap(docLenMap)
-	print readDocLenMap()
+	docLenList = buildDocLenList()
+	# print docLenList
+	dumpDocLenList(docLenList)
+	# print readDocLenList()
 	
