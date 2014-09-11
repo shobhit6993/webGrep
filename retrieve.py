@@ -1,6 +1,7 @@
 import cPickle
 import sys
 from createIndex import postingListFile, bookKeeping, readIndexMap
+import math
 
 def getPostingList(initialOffset):
 	fileObj = open(postingListFile,"rb")
@@ -31,13 +32,21 @@ def convertToTuple(postingListForTerm):
 		postingListTuple.append(tempTuple)
 	return postingListTuple
 
-def intersectionOfTupleList(list1, list2):
+def convertToTfIdfTuple(postingListForTerm, relevantDocs, totalDocs):
+	postingListTuple = []
+	idf = math.log(totalDocs / relevantDocs)
+	for node in postingListForTerm:
+		tempTuple = (node[0], len(node[1]) * idf)
+		postingListTuple.append(tempTuple)
+	return postingListTuple
+
+def intersectionOfTupleList(list1, list2, rankFunction):
 	mergedList = []
 	i = 0
 	j = 0
 	while i != len(list1) and j != len(list2):
 		if list1[i][0] == list2[j][0]:
-			mergedList.append((list1[i][0], min(list1[i][1], list2[j][1])))
+			mergedList.append((list1[i][0], rankFunction(list1[i][1], list2[j][1])))
 			i += 1
 			j += 1
 		elif list1[i][0] > list2[j][0]:
@@ -68,7 +77,7 @@ def unionOfTupleList(list1, list2):
 		else:
 			mergedList.append(list2[j])
 			j += 1
-
+	
 	return mergedList
 	
 def mergePhrasalLists(list1, list2):
