@@ -2,6 +2,7 @@ import ply.yacc as yacc
 from lexer import tokens
 import retrieve
 import time
+from docLen import readDocLenList 
 
 precedence = (
     ('left', 'OR'),
@@ -78,6 +79,10 @@ parser = yacc.yacc()
 t1 = time.time()
 indexMap = retrieve.readIndexMap()
 print "Time to load indexMap = " +str(time.time() - t1)
+
+t1 = time.time()
+docLenMap = readDocLenList()
+print "Time to load docLenList = " +str(time.time() - t1)
     
 while True:
    

@@ -21,13 +21,7 @@ def buildPosList(keyList, posList):
 
 		i += 1
 
-
 def dumpIndexMap(indexMap):
-	fileObj = open(offsetMapFile, "wb")
-	cPickle.dump(indexMap, fileObj )
-	fileObj.close()
-
-def dumpIndexMapSelf(indexMap):
 	strList = []
 	for key in indexMap:
 		strList.append(key + ":"+str(indexMap[key][0])+":"+str(indexMap[key][1])+",")
@@ -140,6 +134,6 @@ if __name__ == "__main__":
 			mergePostingList(postingListForABatch, indexMap, bookKeeping)
 	# Dumping the index into a file
 	# dumpIndexMap(indexMap)
-	dumpIndexMapSelf(indexMap)
+	dumpIndexMap(indexMap)
 	# readPostingFile(indexMap)
 	# print readIndexMap()
