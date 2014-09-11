@@ -2,8 +2,9 @@ import sys
 import cPickle
 import tokenizer
 
-postingListFile = "./indexed/PostingList"
-offsetMapFile = "./indexed/OffsetMap"
+indexFolder = "./indexed/indexed_0_161_notStemmed_stopRetained/"
+postingListFile = indexFolder + "PostingList"
+offsetMapFile = indexFolder + "OffsetMap"
 bookKeeping = 15
 # def tokenize(fileObj):
 # 	s = fileObj.read()
@@ -123,7 +124,7 @@ if __name__ == "__main__":
 			postingListForABatch = {}
 			for j in xrange(batchSize-1, -1, -1):
 				# keyList = tokenizer.getTokenListFromHtml("./dataset/" + str(flr) +"/" + str(flr*10000+batchSize*i+j))
-				keyList = tokenizer.getTokenListFromHtml("./dataset/"+ str(flr)+"/"+str(flr*10000+batchSize*i+j))
+				keyList = tokenizer.getTokensStopWordsRemovedFromHtml("./dataset/"+ str(flr)+"/"+str(flr*10000+batchSize*i+j))
 				# print keyList
 				postingListForAFile = {}
 				buildPosList(keyList, postingListForAFile)
