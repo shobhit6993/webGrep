@@ -23,7 +23,7 @@ def p_expression_and(p):
 	'expression : expression AND expression'
 	if rankingMeasure == "tf":	
 		p[0] = retrieve.intersectionOfTupleList(p[1], p[3], lambda x, y : min(x, y))
-	elif rankingMeasure == "tfidf":
+	elif rankingMeasure == "tfidf" or rankingMeasure == "bm25":
 		p[0] = retrieve.intersectionOfTupleList(p[1], p[3], lambda x, y : (x * y)/(x + y))
 	
 def p_expression_or(p):
@@ -43,6 +43,8 @@ def p_expression_expterm(p):
 			termTuple = retrieve.convertToTuple(postingListForTerm)
 		elif rankingMeasure == "tfidf":
 			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[2]][1], len(docLenList))
+		elif rankingMeasure == "bm25":
+			termTuple = retrieve.convertToBM25Tuple(postingListForTerm, indexMap[p[2]][1], len(docLenList), docLenList, avgDocLen)
 	else:
 		postingListForTerm = []
 		termTuple = []
@@ -59,6 +61,8 @@ def p_expression_term(p):
 			termTuple = retrieve.convertToTuple(postingListForTerm)
 		elif rankingMeasure == "tfidf":
 			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[1]][1], len(docLenList))
+		elif rankingMeasure == "bm25":
+			termTuple = retrieve.convertToBM25Tuple(postingListForTerm, indexMap[p[1]][1], len(docLenList), docLenList, avgDocLen)
 	else:
 		postingListForTerm = []
 		termTuple = []
@@ -101,6 +105,7 @@ print "Time to load indexMap = " +str(time.time() - t1)
 
 t1 = time.time()
 docLenList = readDocLenList()
+avgDocLen = sum(docLenList) / len(docLenList)
 print "Time to load docLenList = " +str(time.time() - t1)
     
 while True:
@@ -115,9 +120,11 @@ while True:
    result = parser.parse(s)
    result.sort(key=lambda x: x[1], reverse=True)
    # sorted(result,key=lambda x: x[1])[::-1]
-   ftemp = open("tf","wb")
+   # ftemp = open("tf","wb")
+   # for i in xrange(0,len(result)):
+   # 	ftemp.write(str(result[i]))
+   # # print result
+   # ftemp.close()
    for i in xrange(0,len(result)):
-   	ftemp.write(str(result[i]))
-   # print result
-   ftemp.close()
+   	print result[i]
    print "Time for query = " +str(time.time() - t1)

@@ -36,9 +36,25 @@ def convertToTfIdfTuple(postingListForTerm, relevantDocs, totalDocs):
 	postingListTuple = []
 	idf = math.log(totalDocs / relevantDocs)
 	for node in postingListForTerm:
-		tempTuple = (node[0], len(node[1]) * idf)
+		tempTuple = (node[0], round(len(node[1]) * idf,2))
 		postingListTuple.append(tempTuple)
 	return postingListTuple
+
+def convertToBM25Tuple(postingListForTerm, relevantDocs, totalDocs, docLenList, avgDocLen):
+	postingListTuple = []
+	idf = math.log(totalDocs / relevantDocs)
+	k = 1.6
+	b = 0.75
+	for node in postingListForTerm:
+		tf = len(node[1])
+		docLen = docLenList[node[0]]
+		score = idf * ((tf * (k + 1))/(tf + k * (1 - b + b * (docLen / avgDocLen))))
+		tempTuple = (node[0], score)
+		postingListTuple.append(tempTuple)
+
+	return postingListTuple
+
+
 
 def intersectionOfTupleList(list1, list2, rankFunction):
 	mergedList = []

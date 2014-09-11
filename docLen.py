@@ -21,8 +21,11 @@ def readDocLenList():
 def buildDocLenList():
 	docLenList = []
 	for flr in xrange(stFlr,enFlr+1):
-		if flr == 3: continue
-		for i in xrange(0, noOfFiles):
+		if flr == 3:
+			for i in xrange(0, noOfFiles):
+				docLenList.append(int(0))
+		else:
+			for i in xrange(0, noOfFiles):
 				fileObj = open("./dataset/"+ str(flr)+"/"+str(flr*noOfFiles+i),"ab")
 				# print  str(flr*noOfFiles+i)
 				docLenList.append(int(fileObj.tell()))
