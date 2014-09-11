@@ -2,7 +2,7 @@ import ply.yacc as yacc
 from lexer import tokens
 import retrieve
 import time
-from docLen import readDocLenMap 
+from docLen import readDocLenList 
 
 def p_expression_paren(p):
 	'expression : LPAREN expression RPAREN'
@@ -74,8 +74,8 @@ indexMap = retrieve.readIndexMap()
 print "Time to load indexMap = " +str(time.time() - t1)
 
 t1 = time.time()
-docLenMap = readDocLenMap()
-print "Time to load docLenMap = " +str(time.time() - t1)
+docLenMap = readDocLenList()
+print "Time to load docLenList = " +str(time.time() - t1)
     
 while True:
    

@@ -1,7 +1,7 @@
 docLenListFile = "DocLenList"
 noOfFiles = 10000
 stFlr = 0
-enFlr = 1
+enFlr = 161
 
 def readDocLenList():
 	fileObj = open(docLenListFile, "rb")
