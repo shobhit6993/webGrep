@@ -39,13 +39,13 @@ def convertToTfIdfTuple(postingListForTerm, relevantDocs, totalDocs):
 		postingListTuple.append(tempTuple)
 	return postingListTuple
 
-def intersectionOfTupleList(list1, list2):
+def intersectionOfTupleList(list1, list2, rankFunction):
 	mergedList = []
 	i = 0
 	j = 0
 	while i != len(list1) and j != len(list2):
 		if list1[i][0] == list2[j][0]:
-			mergedList.append((list1[i][0], min(list1[i][1], list2[j][1])))
+			mergedList.append((list1[i][0], rankFunction(list1[i][1], list2[j][1])))
 			i += 1
 			j += 1
 		elif list1[i][0] > list2[j][0]:
