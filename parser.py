@@ -2,7 +2,9 @@ import ply.yacc as yacc
 from lexer import tokens
 import retrieve
 import time
-from docLen import readDocLenList 
+from docLen import readDocLenList
+import sys
+
 
 precedence = (
     ('left', 'OR'),
@@ -40,7 +42,7 @@ def p_expression_expterm(p):
 		if rankingMeasure == "tf":	
 			termTuple = retrieve.convertToTuple(postingListForTerm)
 		elif rankingMeasure == "tfidf":
-			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[2]], len(docLenList))
+			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[2]][1], len(docLenList))
 	else:
 		postingListForTerm = []
 		termTuple = []
@@ -56,7 +58,7 @@ def p_expression_term(p):
 		if rankingMeasure == "tf":	
 			termTuple = retrieve.convertToTuple(postingListForTerm)
 		elif rankingMeasure == "tfidf":
-			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[2]], len(docLenList))
+			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[1]][1], len(docLenList))
 	else:
 		postingListForTerm = []
 		termTuple = []
@@ -113,7 +115,9 @@ while True:
    result = parser.parse(s)
    result.sort(key=lambda x: x[1], reverse=True)
    # sorted(result,key=lambda x: x[1])[::-1]
-   for i in xrange(1,min(100,len(result))):
-   	print result[i]
+   ftemp = open("tf","wb")
+   for i in xrange(0,len(result)):
+   	ftemp.write(str(result[i]))
    # print result
+   ftemp.close()
    print "Time for query = " +str(time.time() - t1)

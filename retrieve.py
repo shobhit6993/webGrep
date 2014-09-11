@@ -1,6 +1,7 @@
 import cPickle
 import sys
 from createIndex import postingListFile, bookKeeping, readIndexMap
+import math
 
 def getPostingList(initialOffset):
 	fileObj = open(postingListFile,"rb")
@@ -33,7 +34,7 @@ def convertToTuple(postingListForTerm):
 
 def convertToTfIdfTuple(postingListForTerm, relevantDocs, totalDocs):
 	postingListTuple = []
-	idf = log(totalDocs / relevantDocs)
+	idf = math.log(totalDocs / relevantDocs)
 	for node in postingListForTerm:
 		tempTuple = (node[0], len(node[1]) * idf)
 		postingListTuple.append(tempTuple)
