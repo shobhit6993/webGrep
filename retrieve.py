@@ -49,7 +49,7 @@ def convertToBM25Tuple(postingListForTerm, relevantDocs, totalDocs, docLenList, 
 		tf = len(node[1])
 		docLen = docLenList[node[0]]
 		score = idf * ((tf * (k + 1))/(tf + k * (1 - b + b * (docLen / avgDocLen))))
-		tempTuple = (node[0], score)
+		tempTuple = (node[0], round(score,2))
 		postingListTuple.append(tempTuple)
 
 	return postingListTuple

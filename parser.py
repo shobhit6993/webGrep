@@ -42,9 +42,9 @@ def p_expression_expterm(p):
 		if rankingMeasure == "tf":	
 			termTuple = retrieve.convertToTuple(postingListForTerm)
 		elif rankingMeasure == "tfidf":
-			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[2]][1], len(docLenList))
+			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[2]][1], totalDocs)
 		elif rankingMeasure == "bm25":
-			termTuple = retrieve.convertToBM25Tuple(postingListForTerm, indexMap[p[2]][1], len(docLenList), docLenList, avgDocLen)
+			termTuple = retrieve.convertToBM25Tuple(postingListForTerm, indexMap[p[2]][1], totalDocs, docLenList, avgDocLen)
 	else:
 		postingListForTerm = []
 		termTuple = []
@@ -60,9 +60,9 @@ def p_expression_term(p):
 		if rankingMeasure == "tf":	
 			termTuple = retrieve.convertToTuple(postingListForTerm)
 		elif rankingMeasure == "tfidf":
-			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[1]][1], len(docLenList))
+			termTuple = retrieve.convertToTfIdfTuple(postingListForTerm, indexMap[p[1]][1], totalDocs)
 		elif rankingMeasure == "bm25":
-			termTuple = retrieve.convertToBM25Tuple(postingListForTerm, indexMap[p[1]][1], len(docLenList), docLenList, avgDocLen)
+			termTuple = retrieve.convertToBM25Tuple(postingListForTerm, indexMap[p[1]][1], totalDocs, docLenList, avgDocLen)
 	else:
 		postingListForTerm = []
 		termTuple = []
@@ -71,7 +71,12 @@ def p_expression_term(p):
 
 def p_expression_quotes(p):
 	'expression : QUOTE phrasal QUOTE'
-	p[0] = retrieve.convertToTuple(p[2])
+	if rankingMeasure == "tf":
+		p[0] = retrieve.convertToTuple(p[2])
+	elif rankingMeasure == "tfidf":
+		p[0] = retrieve.convertToTfIdfTuple(p[2], len(p[2]), totalDocs)
+	elif rankingMeasure == "bm25":
+		p[0] = retrieve.convertToBM25Tuple(p[2], len(p[2]), totalDocs, docLenList, avgDocLen)
 
 def p_phrasal_term(p):
 	'phrasal : TERM'
@@ -94,8 +99,23 @@ def p_phrasal_phrase(p):
 
 # Error rule for syntax errors
 def p_error(p):
-    print "Syntax error in input!"
-    
+	print "Syntax error in input!"
+
+def rankByTf(q):
+	global rankingMeasure
+	rankingMeasure = "tf"
+	return returnAns(q)
+
+def rankByTfIdf(q):
+	global rankingMeasure
+	rankingMeasure = "tfidf"
+	return returnAns(q)
+
+def rankByBm25(q):
+	global rankingMeasure
+	rankingMeasure = "bm25"
+	return returnAns(q)
+
 # Build the parser
 parser = yacc.yacc()
 
@@ -105,26 +125,21 @@ print "Time to load indexMap = " +str(time.time() - t1)
 
 t1 = time.time()
 docLenList = readDocLenList()
-avgDocLen = sum(docLenList) / len(docLenList)
+totalDocs = len(docLenList)
+avgDocLen = sum(docLenList) / totalDocs
 print "Time to load docLenList = " +str(time.time() - t1)
-    
-while True:
-   rankingMeasure = str(sys.argv[1]).lower()
-   
-   try:
-       s = raw_input('Enter your query: ')
-   except EOFError:
-       break
-   if not s: continue
-   t1 = time.time()
-   result = parser.parse(s)
-   result.sort(key=lambda x: x[1], reverse=True)
-   # sorted(result,key=lambda x: x[1])[::-1]
-   # ftemp = open("tf","wb")
-   # for i in xrange(0,len(result)):
-   # 	ftemp.write(str(result[i]))
-   # # print result
-   # ftemp.close()
-   for i in xrange(0,len(result)):
-   	print result[i]
-   print "Time for query = " +str(time.time() - t1)
+
+def returnAns(q):
+	t1 = time.time()
+	result = parser.parse(q)
+	result.sort(key=lambda x: x[1], reverse=True)
+	# sorted(result,key=lambda x: x[1])[::-1]
+	# ftemp = open("tf","wb")
+	# for i in xrange(0,len(result)):
+	# 	ftemp.write(str(result[i]))
+	# # print result
+	# ftemp.close()
+	for i in xrange(0,len(result)):
+		print result[i]
+	print "Time for query = " +str(time.time() - t1)
+	return result
