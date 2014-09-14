@@ -59,6 +59,10 @@ def getTokenListFromHtml(path):
     tokenizer = RegexpTokenizer(r'\w+')
     return [x.lower() for x in tokenizer.tokenize(inp)]
 
+def getTokens(text):
+	tokenizer = RegexpTokenizer(r'\w+')
+	return [x.lower() for x in tokenizer.tokenize(text)]
+
 def getStemmedWords(list):
     stemmer=PorterStemmer()
     return [stemmer.stem(x) for x in list]

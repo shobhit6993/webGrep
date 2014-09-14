@@ -1,15 +1,11 @@
 import sys
 import cPickle
 import tokenizer
-
-indexFolder = "./indexed/"
+import configVars
+indexFolder =configVars.indexFolder 
 postingListFile = indexFolder + "PostingList"
 offsetMapFile = indexFolder + "OffsetMap"
-bookKeeping = 15
-# def tokenize(fileObj):
-# 	s = fileObj.read()
-# 	return s.split()
-
+bookKeeping = configVars.bookKeeping
 
 def buildPosList(keyList, posList):
 	i = 0

@@ -4,7 +4,7 @@ import retrieve
 import time
 from docLen import readDocLenList
 import sys
-
+import configVars
 
 precedence = (
     ('left', 'OR'),
@@ -139,7 +139,7 @@ def returnAns(q):
 	# 	ftemp.write(str(result[i]))
 	# # print result
 	# ftemp.close()
-	for i in xrange(0,len(result)):
-		print result[i]
+	# for i in xrange(0,len(result)):
+	# 	print result[i]
 	print "Time for query = " +str(time.time() - t1)
 	return result

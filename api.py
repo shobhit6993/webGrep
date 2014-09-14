@@ -18,7 +18,7 @@ import SimpleHTTPServer
 import SocketServer
 import logging
 import cgi
-import webParser
+import parser
 import sys
 import json
 
@@ -55,9 +55,15 @@ class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             variable = str(item)
             value = str(form.getvalue(variable))
             keyDict[variable] = value
-        result = webParser.query(keyDict['query'])
-        logging.warning("\n")
+        result = ""
+        if keyDict['type'] == "tf":
+            result = json.dumps(parser.rankByTf(keyDict['query']))
+        if keyDict['type'] == "tfidf":
+            result = json.dumps(parser.rankByTfIdf(keyDict['query']))
+        if keyDict['type'] == "bm25":
+            result = json.dumps(parser.rankByBm25(keyDict['query']))
 
+        logging.warning("\n")
         self.send_response(200)
         self.send_header("Content-type", "application/json; charset=UTF-8")
         self.end_headers()
