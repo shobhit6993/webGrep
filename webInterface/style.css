@@ -1,0 +1,38 @@
+#main_div{
+  width:900px;
+  margin:auto;
+}
+#main_form{
+  margin: 0 auto; 
+  width:250px;
+}
+#wrapper {
+  display:table;
+  width:800px;
+}
+.row {
+  display:table-row;
+}
+
+.table_heads {
+  display:table-cell;
+  background-color:white;
+  width:300px;
+  text-align: center;
+}
+
+#tf_result {
+  display:table-cell;
+  background-color:#D1D1E0;
+  width:300px;
+}
+#tfidf_result {
+  display:table-cell;
+  background-color:#A7A7B3;
+  width:300px;
+}
+#bm25_result {
+  display:table-cell;
+  background-color:#D1D1E0;
+  width:300px;
+}

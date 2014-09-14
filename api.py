@@ -31,39 +31,41 @@ elif len(sys.argv) > 1:
 else:
     PORT = 8000
     I = ""
-
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler('query.log')
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
     def do_GET(self):
-        logging.warning("======= GET STARTED =======")
-        logging.warning(self.headers)
         SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
     def do_POST(self):
-        logging.warning("======= POST STARTED =======")
-        logging.warning(self.headers)
+
         form = cgi.FieldStorage(
             fp=self.rfile,
             headers=self.headers,
             environ={'REQUEST_METHOD':'POST',
                      'CONTENT_TYPE':self.headers['Content-Type'],
                      })
-        logging.warning("======= POST VALUES =======")
         keyDict = {};
         for item in form.keys():
             variable = str(item)
             value = str(form.getvalue(variable))
             keyDict[variable] = value
         result = ""
+
+        logger.info(keyDict['type']+" - "+keyDict['query'])
         if keyDict['type'] == "tf":
             result = json.dumps(parser.rankByTf(keyDict['query']))
         if keyDict['type'] == "tfidf":
             result = json.dumps(parser.rankByTfIdf(keyDict['query']))
         if keyDict['type'] == "bm25":
             result = json.dumps(parser.rankByBm25(keyDict['query']))
-
-        logging.warning("\n")
         self.send_response(200)
         self.send_header("Content-type", "application/json; charset=UTF-8")
         self.end_headers()
