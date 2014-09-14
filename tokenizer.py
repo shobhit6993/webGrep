@@ -70,6 +70,16 @@ def getStemmedWords(list):
 def removeStopWords(list):
 	return [word for word in list if word not in cachedStopWords]
 
+def removeSingleStopWord(word):
+	if word not in cachedStopWords:
+		return word
+	else:
+		return ""
+
+def getStemmedSingleWord(word):
+	stemmer=PorterStemmer()
+	return stemmer.stem(word)
+
 def getStemmedTokensFromHtml(path):
 	inp = getHtml(path)
 	tokenizer = RegexpTokenizer(r'\w+')

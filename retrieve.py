@@ -34,6 +34,8 @@ def convertToTuple(postingListForTerm):
 
 def convertToTfIdfTuple(postingListForTerm, relevantDocs, totalDocs):
 	postingListTuple = []
+	if relevantDocs==0:
+		return postingListTuple
 	idf = math.log(totalDocs / relevantDocs)
 	for node in postingListForTerm:
 		tempTuple = (node[0], round(len(node[1]) * idf,2))
@@ -42,6 +44,8 @@ def convertToTfIdfTuple(postingListForTerm, relevantDocs, totalDocs):
 
 def convertToBM25Tuple(postingListForTerm, relevantDocs, totalDocs, docLenList, avgDocLen):
 	postingListTuple = []
+	if relevantDocs==0:
+		return postingListTuple
 	idf = math.log(totalDocs / relevantDocs)
 	k = 1.6
 	b = 0.75
