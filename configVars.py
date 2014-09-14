@@ -5,5 +5,5 @@
 
 
 mode = 0
-indexFolder = "./indexed/";
+indexFolder = "./indexed/"
 bookKeeping = 15
