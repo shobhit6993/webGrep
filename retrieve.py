@@ -28,7 +28,7 @@ def getPostingList(initialOffset):
 def convertToTuple(postingListForTerm):
 	postingListTuple = []
 	for node in postingListForTerm:
-		tempTuple = (node[0],round(len(node[1],2)))
+		tempTuple = (node[0],round(len(node[1]),2))
 		postingListTuple.append(tempTuple)
 	return postingListTuple
 
